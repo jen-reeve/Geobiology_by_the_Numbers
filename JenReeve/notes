@@ -43,3 +43,11 @@ Try to find pathways where the steps are known and the kinetics are constrained.
 Maybe present models as final SuperLab meeting.
 
 Build a simple graphical representation of the model we want to tackle. We don't want to create new biology, want to take a conceptual model from the literature and build a Tellurium/Antimony model of it.
+
+Looking at the Log Plotting (Calzone) example notebook.
+
+What do the compartment units mean? Probably volume units to change the concentration values into total units.
+
+Often good to start at the end of your metabolic network as the final steps are often considered to be irreversible. A useful fiction.
+
+Quick derivation of this type of transformation that is enzymatically catalyzed:
