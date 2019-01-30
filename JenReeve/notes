@@ -50,4 +50,46 @@ What do the compartment units mean? Probably volume units to change the concentr
 
 Often good to start at the end of your metabolic network as the final steps are often considered to be irreversible. A useful fiction.
 
-Quick derivation of this type of transformation that is enzymatically catalyzed:
+Quick derivation of this type of transformation that is enzymatically catalyzed (from Noor et. al. 2013 paper):
+
+"Quantum" (unit) process of biochemistry can be represented graphically: Substrate + Enzyme <=> Enzyme-Substrate (Complex)=> Product + Enzyme
+
+This is Michaelis-Menten model (but we will call it the Menten model because she deserves all the credit).
+
+Three kinetic parameters for the model: k_(+1) (forward direction of first step), k_(-1) (reverse direction of the first step), k_(+2) (forward direction of the second step).
+
+We know from elementary chemical theory that the rate of this reaction is equal to the rate of accumulation of the product.
+
+dP/dt = V(S) (where V(S) is the reaction velocity which is dependent on the concentration of the substrate)
+
+This doesn't depend on the concentration of the product, but definitely depends on the concentration of substrate
+
+V(S) = k_(+2) * C (the complex)
+
+Menten assumed that the concentration of the substrate was much much greater than the concentration of the enzyme. so: d(ES)/dt = dC/dt = 0
+
+You end up with a pair of rate laws that reflect these transformations.
+
+1. (k_(+2)+k_(-1)) C = k_(+1) S * E (consumption of the enzyme-substrate complex is equal to the production of the enzyme-substrate complex).
+
+   These rate constants have different units. Consumption has units per time. Production has units of per time*something
+
+2. E_(total) = E + C
+
+   The total enzyme present is equal to the free enzyme times the amount bound up in a complex
+
+E = E_(total) - C
+
+\[
+(k_(+2)+k_(-1)) C + k_(+1) S * C = k_(+1) E_(total) * S
+\]
+
+$$C = (k_(+1) E_(total) * S) / ((k_(+2)+k_(-1)) + k_(+1) * S) = (E_(total) * S) / ((k_(+2) + k_(-1))/k_(+1) + S)$$
+
+Endmember 1: If the concentration of the substrate is much much bigger than the kinetic ratio (k_(+2)+k_(-1))/k_(+1) then V = k_(+2) * E_(total) which defines V_(max) = k_(cat) * E_(total)
+
+Endmember 2: if the concentration of the substrate is equal to the kinetic ratio (see above) then V = (k_(+2) * E_(total) * S) / (2 * S) = (k_(+2) * E_(total)) / 2 = V_(max) / 2
+
+Now getting back to our lactose model:
+
+Use [Brenda](https://www.brenda-enzymes.org/) to get the enzyme kinetic information.
