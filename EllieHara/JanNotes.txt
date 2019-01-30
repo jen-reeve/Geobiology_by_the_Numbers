@@ -1,0 +1,52 @@
+1/30/2019
+Making your own model notes
+
+Make the formyl and THF indendent because THF is what is fed back to formate to continue the reaction.
+
+Important question: How to calibrate model? How to validate or verify or test the model?
+
+What is my question? 
+
+What are our assumptions about "boundary" species? Are they constant or changing over time?
+
+Kcat = number of reaction per unit time
+
+V = change in substrate over time -> negative because being consumed
+
+Km = mMolar
+Substrate = mMolar
+
+dS/dt = 1/1000 * mol/(L*sec)
+
+
+kcat is a turnover number. It has dimensions per time. Typically, 1/sec. But to get the units right, remember
+that the kcat is the amount of reactions per time, so it's mM substrate / (mM Enzyme * sec). It already
+gives you the ratio of substrate to enzyme is built into Kcat. This conversion factor is inherent because
+of the definition of Kcat. 
+
+C1 = environment
+C2 = cell
+
+There's no difference in identity of S1 and S2, because its just a diffusion process. 
+mol S1 / (cm^2 * sec)
+It's diffusion based on area. 
+dS1/dt Need to come up with a representation of this based on the flux. 
+J(A, S1) = Diffusion Constant/delta *(S1-S2)
+Diffusion constant unit = Length^2/t
+delta = length (length over which you're diffusing
+So, P (for permability)= diffusion constant/delta = length / time units
+
+So the overall reaction law we're concerned with
+dS1 / dt = A*P(S1 - S2) 
+
+Assume steady state. 
+d/dt -> 0 
+
+two laws we have to worry about. First one says 
+0 = AP (S1-S2)
+0 = Vmax * S2 / (km+ S2)      steady state gives us the 0's here on the left
+
+What's the functional formula solving for S2?
+
+S1 = constant with infinite volume. Won't use up S1. 
+Textbook: membrane transport section. 
