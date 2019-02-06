@@ -93,3 +93,146 @@ Endmember 2: if the concentration of the substrate is equal to the kinetic ratio
 Now getting back to our lactose model:
 
 Use [Brenda](https://www.brenda-enzymes.org/) to get the enzyme kinetic information.
+
+## Feb 6 2019
+Set up:
+
+Diffusion across the membrane: 0 = area * permeability * (S1-S2)
+
+Consumption of the internal substance, with a silent 3rd substance implied: 0 = (Vmax * S2)/(km + S2)
+
+Steady state: dS/dt = 0
+
+At equilibrium all of the net rates are 0, at steady state all the net rates are constant and all the same.
+
+What here defines our net rate? S1 is constant, we start with no S2 and no S3. Once we start we begin to accumulate S2 and S3 and after a while the rate of accumulation of S3 is linear. This linear accumulation rate is the net rate of the system.
+
+You can't have a steady state without the system having "openness" b/c you are accumulating your final product constantly. Defining your first substrate as constant implies/forces an open system. This is a nuance we should consider.
+
+Perhaps clearer to initially define our equations as:
+
+J_ss = area * permeability * (S1 - S2)
+
+J_ss = (Vmax * S2)/(km + S2)
+
+Final form for quadratic: 0 = A*P*S2^2 + S2 * (Km*A*P - A*P*S1 + Vmax) - Km*A*P*S1
+
+a = A*P
+
+b = km*A*P - A*P*S1 + Vmax
+
+c = -km*A*P*S1
+
+### Units
+
+S1/S2 has units of mass/length^3
+
+km has units of mass/length^3
+
+Area has units of length^2
+
+permeability has units of length/time
+
+so Vmax has units of mass/time
+
+Remember that we determined that Vmax = kcat * Etotal
+
+kcat had units of turnover time aka 1/time but really it was mass of substrate/(mass of enzyme * time)
+
+So Vmax has units of mass substrate per time per length^3
+
+So now we have incorporated our volume into the Vmax term, this is the total Vmax, aka on a per cell basis. So to compare these two Vmax terms (the Vmax per enzyme and the Vmax per cell): Vmax_cell = constant * Vmax_enyzme where the constant must have units of length^3 so it must be the volume of the cell.
+
+Vmax_cell is essentially the amount of reactions in the cell
+
+Use our minimum and maximum concentrations in cells as a way to detect units problems.
+
+Our concentrations are given in mass per length cubed given as molarity which is moles per liter. This means that the length unit we are using is the cube root of a liter. Which is (10^3 cm^3)^(1/3) or 10 cm or 1 dm.
+
+We have taken our cell, called it a sphere and then unfurled it and put walls at each end of the membrane so that we can consider things in terms of the surface area. This implies that there is not differential spatial distribution of things in the cells.
+
+For next class:
+
+1. take your antimony code and compare it at steady state to the values you just got. Going to need to know some commands about steady state values (already in code stolen from Boz).
+2. explore how the steady state values relate to the external lactose concentration. Make plots of internal vs. external lactose concentration and use the python code.
+
+### Calculations
+Calculating what we expect the steady state concentration of S3 (intracellular lactose) to be:
+```
+import math
+import numpy as np
+import tellurium as te
+# this is our calculation to check our numerical calculations
+# 1 liter = 1 dm^3
+area = 1.0e-10; # dm^2
+permeability = 1.0e-8; # dm s-1
+km = 5.5e-3; # M
+S1 = 1; # M
+kcat = 6.42e2; # s-1
+etot = 1.0e-6; # M
+vol_cell = 10e-15; # L or dm^3
+a = area * permeability;
+b = km*area*permeability-area*permeability*S1+kcat*etot*vol_cell;
+c = -1*km*area*permeability*S1;
+S3_ss=(-b+(b**2-4*a*c)**0.5)/(2*a);
+print(a,b,c)
+print('S3_ss',S3_ss)
+```
+Gives 86uM which is nicely in between our limits of physiological concentrations.
+
+Checking that a steady state concentration gives net rates that are equivalent for our two J_ss equations:
+```
+J_ss1=area*permeability*(S1-S3_ss);
+print('J_ss1',J_ss1)
+J_ss2=(kcat*etot*vol_cell*S3_ss)/(km+S3_ss);
+print('J_ss2',J_ss2)
+```
+Woo these give the same number. 10^-21 moles per second (per cell) which converts to 10^-16 moles per day (per cell) aka one femtomole per day (per cell) we will call this unit a Jorgensen aka a Jorg. This is a reality check, we put in numbers out of nowhere and got a number that was hard to understand, so we can convert into Jorgs and that is a reasonable process rate for cells in the environment. In culture these rates will always be faster.
+
+Model:
+```
+model LacPath
+    compartment cytoplasm;
+    cytoplasm = 1.0;
+    compartment environment;
+    environment = 1000.0;
+    species lactose, glucgalac;
+    const species ex_lactose;
+    unit M = mole / liter
+    unit inv_sec = 1. / seconds
+    unit um = 10.e-6 meters
+    unit vol_conv = 1000 liter/1 meter^3
+
+    lactose = 0.0 M; # M; free parameter
+    glucgalac = 0.0 M;
+    ex_lactose = 0.1 M;
+
+    lactose in cytoplasm; glucgalac in cytoplasm;
+    ex_lactose in environment
+
+    J34: lactose -> glucgalac; kcat*Etot*lactose/(Km+lactose);
+
+    kcat = 6.42e2 inv_sec; #s^-1; from Juers et al (2012)
+    Etot = 1.e-6 M; # M; free parameter
+    Km = 5.5e-3 M; # M; from BRENDA
+
+    #J13: ex_lactose => lactose; area*permeability*(ex_lactose-lactose)*conversion;
+    #J31: lactose => ex_lactose; area*permeability*(lactose-ex_lactose)*conversion;
+
+    area = 5 um^2;
+    permeability = 3 um * 1 inv_sec;
+    conversion = 1 vol_conv;
+end
+```
+
+Running the model
+```
+LacPath.reset()
+LacPath.simulate(0., 100., 1000) #'S1','J1'
+LacPath.plot()
+
+values = LacPath.getSteadyStateValues()
+selections = LacPath.steadyStateSelections
+print(values)
+print(selections)
+```
