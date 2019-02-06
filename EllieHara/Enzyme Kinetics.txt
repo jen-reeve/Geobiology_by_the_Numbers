@@ -1,0 +1,67 @@
+"Quantum" process of biochemistry can be represented graphically
+(substrate coexisting with some enzyme) => (Substrate Enzyme complex) => Product + Enzyme
+S + E <=> ES (or C for complex) => P + E
+
+Option 1) Complex decomposes
+Option 2) Complex makes product and enzyme is freed for future reactions
+
+Kinetic Rate Laws
+k1+ : Complex Forms
+k1- : complex decomposes
+k2+ : copmlex goes forward to make product
+
+Rate of this reaction is equal to the rate of accumulation of product. 
+
+dP/dt = v(S) = k2*C
+	this velocity should depend on S, but not the P
+
+Mented & M assumed S >>>> E ... therefore  d(ES)/dt = dC/dt = 0
+
+(1) (k2+ + k1-)C = k1+ * S * E
+   consumption     production
+
+(2) Etot = E + C
+
+We want to actually figure out this rate law, the dP/dt = v(S), but it also depends on the complex. So use (1) and
+(2) to get an expression for this
+
+E = Etot - C (substitute into 1)
+(k2+ + k1-)*C + k1+*S*C = k1+*Etot*S
+
+C = (k1+*Etot*S)/((K2+ + k1-)+k1+*S) = (Etot * S ) / (((k2+ + k1+)/k1+)+S) <= send back into the v(S) so
+
+V(S) = (k2*Etot*S)/(((k2+ + k1+)/k1+)+S)
+
+	if substrate is much much larger than E, then V(S) effectively becomes
+	V(S) = K2+ * Etot 
+	Means that your enzymes are all bound/ tied up
+	This is our maximum, so
+	V(max) = kcat * Etot
+
+	if S = (k2+ + k-1)/k1+  --> V= K2+ * Etot * S / (S + S) = (k2+* E)/2
+	or... V(max)/2
+
+	dP/dt = V(S) = (V(max)*S)/(Km + S) = (kcat*Etot*S)/(Km+S)
+
+     |						with V(max), 0.5 V(max) and 0, you can completely define this curve
+     |		
+     |	                       
+     |	               ...............
+     |	         .
+V(S) |       . 
+     |	   .  
+     |	  .
+     |	 .
+     |  .
+     |.________________________________
+                    S 	
+
+
+Key assumption to allow all of this is that the Substrate Enzyme complex was at steady state because S>>>> E so all the
+E would be bound to the S available. 
+
+
+Kcat/KM = slope at low S
+
+
+
