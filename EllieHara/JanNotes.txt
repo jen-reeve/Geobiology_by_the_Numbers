@@ -50,3 +50,20 @@ What's the functional formula solving for S2?
 
 S1 = constant with infinite volume. Won't use up S1. 
 Textbook: membrane transport section. 
+
+SO Take away = be aware if you're defining in the cell, out of the cell, and make sure you know what the units
+of the numbers you are using and know what you.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
