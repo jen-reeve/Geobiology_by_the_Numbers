@@ -238,6 +238,7 @@ print(selections)
 ```
 
 ## Homework from Feb 5 2019
+not functional code
 ```
 import math
 import numpy as np
@@ -261,4 +262,129 @@ S3_ss=(-b+(b**2-4*a*c)**0.5)/(2*a);
 plt(S1,S3_ss)
 
 
+```
+
+## Feb 13 2019 class
+Diffusion:
+
+Looking at the movement of lactose from the environment (external lactose)
+ into the cell (internal lactose). There is resistance to diffusion given
+  by the permeability multiplied by the surface area. We end up with a
+  diffusive flux that is equal to the permeability times the surface area
+   times the difference in concentrations between the external and
+   internal concentrations. This is a net flux. If you wanted to
+   calculate the flux in each direction separately then the flux in would
+    be the permeability times the area times the external concentration
+    and the flux out would be the permeability times the area times the
+    internal concentration.
+
+In this case the net flux is easy and equivalent. If we get into
+isotopic stuff then we need to look at the ratio of the flux in
+each direction.
+
+Next steps: do we want to work on changing our units into biochemists'
+units or add another step? By putting things in biochemists' units
+(per mg cell protein) we might be able to make adding the periplasm a
+ lot easier.
+
+The periplasm is approximately 10nm thick. So the relative volume of the
+ periplasm is 10^-6 times the volume of the cell aka a million times smaller.
+ This would make the concentration of one molecule in the periplasm
+ approximately 1mM. And the maximum concentration is still 100mM, so
+ we have a very narrow range of concentrations possible in the periplasm.
+
+For next week: add a second rate law that we are just considering passive
+transport across the inner membrane. And then next week we can translate
+this into an active transport law.
+
+### Code
+```
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+import tellurium as te
+# this is our calculation to check our numerical calculations
+# 1 liter = 1 dm^3
+area = 1.0e-10; # dm^2
+permeability = 1.0e-8; # dm s-1
+km = 5.5e-3; # M
+S1 = np.linspace(0.001,1,100); # M
+kcat = 6.42e2; # s-1
+etot = 1.0e-6; # M
+vol_cell = 1.0e-15; # L or dm^3
+a = area * permeability;
+b = km*area*permeability-area*permeability*S1+kcat*etot*vol_cell;
+c = -1*km*area*permeability*S1;
+S3_ss=(-b+(b**2-4*a*c)**0.5)/(2*a);
+#print(a,b,c)
+#print('S3_ss',S3_ss)
+plt.plot(S1,S3_ss)
+plt.ylabel('Internal lactose (M)')
+plt.xlabel('External lactose (M)')
+```
+
+```
+J_ss1=area*permeability*(S1-S3_ss)*(60*60*24)*10e15;#fmol/day
+#print('J_ss1',J_ss1)
+J_ss2=(kcat*etot*vol_cell*S3_ss)/(km+S3_ss)*(60*60*24)*10e15; #fmol/day
+#print('J_ss2',J_ss2)
+plt.plot(S1,J_ss1)
+plt.xlabel('External lactose (M)')
+plt.ylabel('Diffusion (fmol/day)')
+```
+
+```
+plt.plot(S1,J_ss2)
+plt.xlabel('External lactose (M)')
+plt.ylabel('Lactose conversion (fmol/day)')
+```
+
+Model:
+```
+model LacPath
+    compartment cytoplasm;
+    cytoplasm = 1.0e-6;
+    compartment environment;
+    environment = 1.0;
+    species lactose, glucgalac;
+    const species ex_lactose;
+    unit M = mole / liter
+    unit inv_sec = 1. / seconds
+    unit um = 10.e-6 meters
+    unit vol_conv = 1000 liter/1 meter^3
+    unit dm = 0.01 meters
+
+    lactose = 0.0; # M; free parameter
+    glucgalac = 0.0;
+    ex_lactose = 0.1;
+
+    lactose in cytoplasm; glucgalac in cytoplasm;
+    ex_lactose in environment
+
+    J34: lactose -> ; kcat*Etot*vol_cell*lactose/(Km+lactose);
+
+    kcat = 6.42e2; #s^-1; from Juers et al (2012)
+    Etot = 1e-6; # M; free parameter
+    Km = 5.5e-3; # M; from BRENDA
+    vol_cell = 1.0e-15; # L or dm^3
+
+    J13: ex_lactose => lactose; surf_area*permeability*(ex_lactose-lactose);
+    #J31: lactose => ex_lactose; surf_area*permeability*(lactose-ex_lactose)*conversion;
+
+    surf_area = 1.0e-10; # dm^2
+    permeability = 1.0e-8; # dm s-1
+    #conversion = 1 vol_conv;
+end
+```
+
+```
+LacPath.reset()
+LacPath.simulate(0., 10e10, 1000,['time','[lactose]']) #'S1','J1'
+LacPath.plot()
+
+LacPath.steadyStateSelections = ['[lactose]','J34','J13']
+values = LacPath.getSteadyStateValues()
+selections = LacPath.steadyStateSelections
+print(values)
+print(selections)
 ```

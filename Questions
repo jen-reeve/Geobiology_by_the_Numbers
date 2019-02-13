@@ -19,3 +19,18 @@ But Antimony doesn't actually care, this is just to help us keep track.
 
 ## Why can't I move cells around???
 Ask the developer.
+
+## What the frick are compartments and how can I actually use them?
+Ask the developer.
+
+## Can I tell the steady state solver to ignore a constantly accumulating species or to look for a steady state rate?
+Can you pull rates out of an Antimony model? Yes!
+
+This will print the steady state values for the things defined in the model as S1 and J12. Basically with the first command you are telling it to give you the steady state values for the things you request.
+```
+r.steadyStateSelections = ['[S1]','J12']
+values = r.getSteadyStateValues()
+selections = r.steadyStateSelections
+print(values)
+print(selections)
+```
