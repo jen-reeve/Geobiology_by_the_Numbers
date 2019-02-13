@@ -236,3 +236,29 @@ selections = LacPath.steadyStateSelections
 print(values)
 print(selections)
 ```
+
+## Homework from Feb 5 2019
+```
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+import tellurium as te
+# this is our calculation to check our numerical calculations
+# 1 liter = 1 dm^3
+area = 1.0e-10; # dm^2
+permeability = 1.0e-8; # dm s-1
+km = 5.5e-3; # M
+S1 = np.linspace(0.1,10,100); # M
+kcat = 6.42e2; # s-1
+etot = 1.0e-6; # M
+vol_cell = 10e-15; # L or dm^3
+a = area * permeability;
+b = km*area*permeability-area*permeability*S1+kcat*etot*vol_cell;
+c = -1*km*area*permeability*S1;
+S3_ss=(-b+(b**2-4*a*c)**0.5)/(2*a);
+#print(a,b,c)
+#print('S3_ss',S3_ss)
+plt(S1,S3_ss)
+
+
+```
