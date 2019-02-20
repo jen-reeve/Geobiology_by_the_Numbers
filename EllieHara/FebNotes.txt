@@ -1,0 +1,6 @@
+Lambda = 1/time
+Jsteady state = Moles/(cell*time)
+need to know something about moles and cells.
+S1 is a concentration in 10^03 mol/L (feeding lactose to the system) *multiply by culture volume (L)
+Cells = 10^9 cells/mL * volume of culture (mL). this gives us total number of cell 
+
