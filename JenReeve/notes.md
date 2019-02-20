@@ -389,3 +389,76 @@ selections = LacPath.steadyStateSelections
 print(values)
 print(selections)
 ```
+
+## Homework for Feb 20th 2019
+Something new about Antimony: the ability to have events (where passing a threshold changes other things)
+and to have DNA strands so that production of enzymes is tied to a regulatory event.
+
+Plotting of steady state rates against external lactose concentration is in
+the previous code.
+
+Model edits:
+```
+model LacPath
+    compartment cytoplasm;
+    cytoplasm = 1.0e-6;
+    compartment environment;
+    environment = 1.0;
+    compartment periplasm;
+    periplasm = 1.0e-6;
+    species lactose, glucgalac, peri_lactose;
+    const species ex_lactose;
+    unit M = mole / liter
+    unit inv_sec = 1. / seconds
+    unit um = 10.e-6 meters
+    unit vol_conv = 1000 liter/1 meter^3
+    unit dm = 0.01 meters
+    #pi = 3.1415;
+
+    lactose = 0.0; # M; free parameter
+    glucgalac = 0.0;
+    peri_lactose = 0.0;
+    ex_lactose = 0.1;
+
+    lactose in cytoplasm; glucgalac in cytoplasm;
+    peri_lactose in periplasm;
+    ex_lactose in environment
+
+    J34: lactose -> ; kcat*Etot*vol_cell*lactose/(Km+lactose);
+
+    kcat = 6.42e2; #s^-1; from Juers et al (2012)
+    Etot = 1e-6; # M; free parameter
+    Km = 5.5e-3; # M; from BRENDA
+
+    J12: ex_lactose => peri_lactose; surf_area_peri*permeability*(ex_lactose-peri_lactose);
+    J23: peri_lactose => lactose; surf_area*permeability*(peri_lactose-lactose);
+    #J31: lactose => ex_lactose; surf_area*permeability*(lactose-ex_lactose)*conversion;
+
+    # cell area/volume calculations
+
+    cell_radius = 400.0e-9 # E coli radius from Bionumbers
+    vol_cell = (4/3)*pi*cell_radius^3
+    surf_area = 4*pi*cell_radius^2
+    #surf_area = 1.0e-10; # dm^2
+    peri_thickness = 10.0e-9 # 10nm
+    cell_peri_radius = cell_radius+peri_thickness
+    vol_peri = ((4/3)*pi*cell_peri_radius^3)-vol_cell
+    surf_area_peri = 4*pi*cell_peri_radius^2
+
+    # membrane properties
+    permeability = 1.0e-8; # dm s-1
+
+end
+```
+
+```
+LacPath.reset()
+LacPath.simulate(0., 10e14, 1000,['time','[lactose]','[peri_lactose]']) #'S1','J1'
+LacPath.plot()
+
+LacPath.steadyStateSelections = ['[lactose]','J34','J12','J23','[peri_lactose]']
+values = LacPath.getSteadyStateValues()
+selections = LacPath.steadyStateSelections
+print(values)
+print(selections)
+```
