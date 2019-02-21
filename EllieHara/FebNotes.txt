@@ -1,0 +1,87 @@
+Feb. Notes
+2/5/2019
+Github tutorial by Jen...
+Reviewing equations from last week:
+0 = A * P (S1-S2)
+0 = (Vmax S2)/(Km+S2)
+
+Haven't explicitly defined S3, but since we're consuming S2, we must be making S3.
+S1 -> S2 -> "S3"
+
+Steady State
+	1) change in concentration is 0
+	2) At equilibrium, all net rate is 0, but at steady state, it's constant and all the same!
+		~Notice the subtle difference. 
+
+$S1 (species level is constant with $ in antimony)
+S3 would accumulate linearly, because constant slope froms steady state. The net rate is thus
+the constant accumulation of S3. The accumulation rate = net rate. Can't have steady state if you
+don't have  "Openness" because if you keep accumulating, you'll end up hitting EQUILIBRIUM, 
+for the forward and back reactions. So, if you have an open system, you're able to continue
+accumulating S3. Easy way to do this is to make S1 a $S1, because it implies an open system
+to keep "refilling" the S1. 
+
+So, instead of 0,
+
+J(s.s.) =  A * P (S1-S2)
+J(s.s.) = (Vmax S2)/(Km+S2)
+A = area, P = permeability, S1 = constant
+UNITS
+Permeability units: Length^2/time/legnth = length / time	
+Area = length^2
+
+AP(S1-S2) = (Vmax*S2)/(Km+S2)
+Mass/time = , so Vmax needs to be mass/time
+Vmax = kcat * Enzyme concentration
+vmax units: (Mass of substrate / mass enzyme / time)(Mass enzyme / L^3)
+	: Mass substrate / (L^3 * time)
+
+but going back to the previous equation we don't have Length^3 for the Vmax
+So this one already includes volume. so we're doing this on a percell basis. 
+
+Converting Vmax enzyme to Vmax cell
+Vmax cell = Constant * Vmax enzyme
+this constant's units must be length^3, so it must be equal to the volume * V max enzyme
+So, this constant is thus the volume of the cell...
+Vmax cell = Volume cell * Vmax enzyme.
+
+Area = surface area of the cell. 
+
+
+mass/Length^3 = molarity so moles/liters 
+so, length unit is defined by liters. which is how we get that each length unit is a decimeter. 
+L = (liter)^1/3
+L = (10^3 cm ^3)^1/3
+L = 10 cm
+so, length is 1 decimeter.
+
+
+** is ^. ^ doesn't work.
+
+
+kcat = property of a single enzyme, so you need to multiply by volume of cell 
+
+Vmax = kcat*volumeofcell*enzymetotal
+
+
+
+
+Lactose code chunk now calculates the steady state concentration of a system.
+We did this to do a reality check, and something to peg our model code against.
+
+Simple model to check that the more complicated model is doing the same thing. 
+
+values = LacPath.getSteadyStateValues()
+selections = LacPath.steadyStateSelection()
+
+
+
+
+
+
+
+
+
+
+
+
