@@ -390,6 +390,7 @@ print(values)
 print(selections)
 ```
 
+
 ## Homework for Feb 20th 2019
 Something new about Antimony: the ability to have events (where passing a threshold changes other things)
 and to have DNA strands so that production of enzymes is tied to a regulatory event.
@@ -621,3 +622,4 @@ half_life_days = half_life_ss /(60*60*24)
 te.plot(S1,half_life_ss)
 te.plot(S1,half_life_days)
 ```
+
