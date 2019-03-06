@@ -389,3 +389,237 @@ selections = LacPath.steadyStateSelections
 print(values)
 print(selections)
 ```
+
+
+## Homework for Feb 20th 2019
+Something new about Antimony: the ability to have events (where passing a threshold changes other things)
+and to have DNA strands so that production of enzymes is tied to a regulatory event.
+
+Plotting of steady state rates against external lactose concentration is in
+the previous code.
+
+Model edits:
+```
+model LacPath
+    compartment cytoplasm;
+    cytoplasm = 1.0e-6;
+    compartment environment;
+    environment = 1.0;
+    compartment periplasm;
+    periplasm = 1.0e-6;
+    species lactose, glucgalac, peri_lactose;
+    const species ex_lactose;
+    unit M = mole / liter
+    unit inv_sec = 1. / seconds
+    unit um = 10.e-6 meters
+    unit vol_conv = 1000 liter/1 meter^3
+    unit dm = 0.01 meters
+    #pi = 3.1415;
+
+    lactose = 0.0; # M; free parameter
+    glucgalac = 0.0;
+    peri_lactose = 0.0;
+    ex_lactose = 0.1;
+
+    lactose in cytoplasm; glucgalac in cytoplasm;
+    peri_lactose in periplasm;
+    ex_lactose in environment
+
+    J34: lactose -> ; kcat*Etot*vol_cell*lactose/(Km+lactose);
+
+    kcat = 6.42e2; #s^-1; from Juers et al (2012)
+    Etot = 1e-6; # M; free parameter
+    Km = 5.5e-3; # M; from BRENDA
+
+    J12: ex_lactose => peri_lactose; surf_area_peri*permeability*(ex_lactose-peri_lactose);
+    J23: peri_lactose => lactose; surf_area*permeability*(peri_lactose-lactose);
+    #J31: lactose => ex_lactose; surf_area*permeability*(lactose-ex_lactose)*conversion;
+
+    # cell area/volume calculations
+
+    cell_radius = 400.0e-9 # E coli radius from Bionumbers
+    vol_cell = (4/3)*pi*cell_radius^3
+    surf_area = 4*pi*cell_radius^2
+    #surf_area = 1.0e-10; # dm^2
+    peri_thickness = 10.0e-9 # 10nm
+    cell_peri_radius = cell_radius+peri_thickness
+    vol_peri = ((4/3)*pi*cell_peri_radius^3)-vol_cell
+    surf_area_peri = 4*pi*cell_peri_radius^2
+
+    # membrane properties
+    permeability = 1.0e-8; # dm s-1
+
+end
+```
+
+```
+LacPath.reset()
+LacPath.simulate(0., 10e14, 1000,['time','[lactose]','[peri_lactose]']) #'S1','J1'
+LacPath.plot()
+
+LacPath.steadyStateSelections = ['[lactose]','J34','J12','J23','[peri_lactose]']
+values = LacPath.getSteadyStateValues()
+selections = LacPath.steadyStateSelections
+print(values)
+print(selections)
+```
+
+## February 20th 2019
+### New things:
+* don't close the Tellurium notebook until the "save successful" message appears, double check the "last save" time in the lower right hand corner to make sure the save happened
+* DNA! You can pass rates onto downstream elements and use promoters to control gene product production
+* Events: can have threshold values that lead to other changes in the system (changing parameters)
+* Units: it is mostly just for record keeping, but it can be very helpful
+* Arrays: can make an array ```np.arange(start,stop,step size)``` or ```np.linspace(start,stop,step number)``` in a python cell with numpy (hence np.)
+* Subplots: load in at the top ```te.newTiledFigure(rows=2,cols=3)```, and then define each plot
+* Use Shift+Enter to run scripts without using the button
+* membrane transporter protein: e is the number of moles of pore per area (# of proteins/membrane area)
+* transport saturation: J_a=(e x kf x S1 - kr x S2)/(1 + (S1 / km1) + (S2 / km2))
+* when simulaing the tellurium model the third option isn't actually steps divided evenly, but if you explicitly define these terms then it will do what you think it should do: ```LacPath.simulate(start = 0, end =5.64e4, steps = 100)```
+
+Plotting:
+
+Can use matplotlib ```import matplotlib.pyplot as plt``` and then use commands like ```plt.plot(x,y)``` or  ```plt.scatter(x,y)```
+
+Tellurium includes the plotly engine and as long as you have imported Tellurium you can use ```te.plot(x,y)```
+
+Even better is that we can change our axes to logarithmic via ```te.plot(x,y,logx=True,logy=False)```
+
+Time of culturing is on the order of hours to days. Growth stops because you run out of something essential.
+
+We have an idea about the steady state rate of a cell and can hopefully scale this to a culture and then calculate how long it would take for the culture to run out of lactose.
+
+An OD of 1.0 is approximately 10^9 or 10^10 cells per mL.
+
+But we are in the GEOLOGY DEPARTMENT we don't care about cell time scales, we care about radioactive decay time scales. The rate law that defines our world is: dNp/dt = - lambda Np, Np = Np(0)e^(-lambda t). Lambda is a rate constant with units per time.
+
+Np/Np(0) = 0.5 = e^(-lambda t1/2) so ln(0.5) = -lambda t1/2 so t1/2 = ln(0.5)/-lambda
+
+We can calculate a "half life" of a culture. To use half the stuff in a culture takes about a day. This gives us a way to check if the rate we are getting is reasonable given the real world.
+
+We need to find our rate constant, what are the units? J_ss is in moles per cell per time. How do we convert? We need to know something about moles and something about cells. Something about moles: S1 = 10^-3 moles per liter so multiply by the volume of the culture (in L). Something about cells: 10^9 cells per mL so multiply by the volume of the culture (in mL) to get total number of cells.
+
+How are we going to take our steady state rate and convert it into a decay constant? Jss * (1/S1) * (1/volume) * cell numbers
+
+The actual half life should be longer because the rate decreases as the nutrient concentration decreases. And we have assumed constant cell numbers which has issues... b/c we used 10^9 which is essentially a final cell density, the half life should be longer yet again.
+
+French press detour.
+
+What do we know? We know that our steady state rate gives us a time constant that is sensible.
+
+How can we use this to evaluate our Tellurium model? Take the steady state rate that we calculate from the model and calculate a half life that is on the order of hours to days. Basically do the same conversions as with the analytical model.
+
+### for next time
+go try to get the things that boz has working working for you too!
+* figure out compartments (Boz did this by messing with radioactive decay)
+  * compartments seem to modify the rate constant
+  * change the rate law to include the compartment size to avoid the rate constant depending on the compartment size
+  * redefine our compartments in terms of things we actually care about (culture volume, cell volumes etc)
+
+
+
+### Code
+```
+model LacPath
+    compartment cytoplasm;
+    cytoplasm = 1.0e-6;
+    compartment environment;
+    environment = 1.0;
+    compartment periplasm;
+    periplasm = 1.0e-6;
+    species lactose, glucgalac, peri_lactose;
+    const species ex_lactose;
+    unit M = mole / liter
+    unit inv_sec = 1. / seconds
+    unit um = 10.e-6 meters
+    unit vol_conv = 1000 liter/1 meter^3
+    unit dm = 0.01 meters
+    #pi = 3.1415;
+
+    lactose = 0.0; # M; free parameter
+    glucgalac = 0.0;
+    peri_lactose = 0.0;
+    ex_lactose = 0.1;
+
+    lactose in cytoplasm; glucgalac in cytoplasm;
+    peri_lactose in periplasm;
+    ex_lactose in environment
+
+    J34: lactose -> ; kcat*Etot*vol_cell*lactose/(Km+lactose);
+
+    kcat = 6.42e2; #s^-1; from Juers et al (2012)
+    Etot = 1e-6; # M; free parameter
+    Km = 5.5e-3; # M; from BRENDA
+
+    J12: ex_lactose => peri_lactose; surf_area_peri*permeability*(ex_lactose-peri_lactose);
+    J23: peri_lactose => lactose; surf_area*permeability*(peri_lactose-lactose);
+    #J31: lactose => ex_lactose; surf_area*permeability*(lactose-ex_lactose)*conversion;
+
+    # cell area/volume calculations
+
+    cell_radius = 400.0e-9 # E coli radius from Bionumbers
+    vol_cell = (4/3)*pi*cell_radius^3
+    surf_area = 4*pi*cell_radius^2
+    #surf_area = 1.0e-10; # dm^2
+    peri_thickness = 10.0e-9 # 10nm
+    cell_peri_radius = cell_radius+peri_thickness
+    vol_peri = ((4/3)*pi*cell_peri_radius^3)-vol_cell
+    surf_area_peri = 4*pi*cell_peri_radius^2
+
+    # membrane properties
+    permeability = 1.0e-8; # dm s-1
+
+end
+```
+
+```
+LacPath.reset()
+LacPath.simulate(0., 10e14, 1000,['time','[lactose]','[peri_lactose]']) #'S1','J1'
+LacPath.plot()
+
+LacPath.steadyStateSelections = ['[lactose]','J34','J12','J23','[peri_lactose]']
+values = LacPath.getSteadyStateValues()
+selections = LacPath.steadyStateSelections
+print(values)
+print(selections)
+```
+
+```
+area = 1.0e-10; # dm^2
+permeability = 1.0e-8; # dm s-1
+km = 5.5e-3; # M
+S1 = np.linspace(0.001,1,100); # M
+kcat = 6.42e2; # s-1
+etot = 1.0e-6; # M
+vol_cell = 1.0e-15; # L or dm^3
+a = area * permeability;
+b = km*area*permeability-area*permeability*S1+kcat*etot*vol_cell;
+c = -1*km*area*permeability*S1;
+S3_ss=(-b+(b**2-4*a*c)**0.5)/(2*a);
+#print(a,b,c)
+#print('S3_ss',S3_ss)
+#plt.plot(S1,S3_ss)
+#plt.ylabel('Internal lactose (M)')
+#plt.xlabel('External lactose (M)')
+te.plot(S1,S3_ss,logx=True,logy=False) # te.plot seems to ignore requests to set logy=False
+
+# or try this by taking the log of the values and then plot
+logS1 = np.log10(S1) # log() is the natural log!
+logS3ss = np.log10(S3_ss)
+
+te.plot(logS1,logS3ss)
+```
+
+```
+J_ss1=area*permeability*(S1-S3_ss)
+culture_volume_mL = 10 # mL
+culture_volume_L = culture_volume_mL * 1e-3
+cell_density = 1e9 # cells per mL
+cell_number = cell_density * culture_volume_mL
+k_ss = J_ss1 * (1/S1) * (1/culture_volume_L) * cell_number
+half_life_ss = -1 * np.log(0.5) / k_ss
+half_life_days = half_life_ss /(60*60*24)
+te.plot(S1,half_life_ss)
+te.plot(S1,half_life_days)
+```
+
