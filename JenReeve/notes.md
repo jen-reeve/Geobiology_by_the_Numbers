@@ -623,3 +623,158 @@ te.plot(S1,half_life_ss)
 te.plot(S1,half_life_days)
 ```
 
+## March 20 2019
+Looking at reversibility/irreversibility:
+
+How did we define before?
+
+Km is the substrate concentration where V is equal to one half of Vmax.
+Vmax is equal to the enzyme catalysis rate.
+So far we have treated the enzyme concentration as constant, moving forward we may want to consider the concentration to be a variable.
+
+We got all the kcat/V/Km stuff from the elementary rate constants from a reaction that proceeds as: S + E <-> ES -> P + E.
+We have set this up so that the product cannot go backward.
+If we change the second step so that it can go backwards then the reaction becomes reversible.
+Now we have: S + E <-> C <-> P + E.
+So the enzyme complex can either become the enzyme and the product or the enzyme and the substrate.
+For now we are going to ignore the interchange etc in the enyzme complex.
+
+Let's skip the algebra and assert that this situation is easiest to think of in terms of two irreversible reactions.
+The first, forward, is S + E <-> C -> P + E.
+The second, reverse, is P + E <-> C -> S + E.
+For the forward direction: Vmax = k_+2 x E_tot, Km = (k_+2 + k_-1)/k_1.
+For the reverse direction: Vmax = k_-1 x E_tot, Km = (k_-1 + k_+2)/k_-2.
+
+Now we can combine these into a net reversible rate law.
+The net rate is dependent on the substrate and product concentrations.
+V(S,P) = ((Vmax_f x S / Km_f) - (Vmax_r x P / Km_r)) / (1 + (S / Km_f) + (P / Km_r)).
+So what are units?
+When you add things they must have the same units.
+1 is unitless so (S / Km_f) and (P / Km_r) are both unitless meaning that Km_f and Km_r both have units of concentration.
+k_cat has some subtlety in that it technically has units of 1/t, but that one includes the moles of substrate converted per mole of enzyme.
+
+At equilibrium, the net conversion (V) is 0.
+So ((Vmax_f x S_eq / Km_f) - (Vmax_r x P_eq / Km_r)) / (1 + (S_eq / Km_f) + (P_eq / Km_r)) = 0.
+The only way this can be equal to zero is if (Vmax_f x S_eq / Km_f) = (Vmax_r x P_eq / Km_r).
+(P_eq / S_eq) = (Vmax_f / Km_f) / (Vmax_r / Km_r).
+(Vmax / Km) reflects the slope when the available substrate is going to zero.
+(P_eq / S_eq) is the equilibrium constant (K_eq).
+This is a fundamental relationship between kinetics at their limits and equilibrium thermodynamics.
+It allows us to remove some of the unknowns from our equation.
+Vmaxs and the kcats are empirical.
+The influence of K_eq on the rate law is what determines if the reaction is reversible or not.
+
+V(S,P) = Vmax_f x ((S / Kmax_f) / (1 + (S / Km_f) + (P / Km_r))) x (1 - (P / S) / (K_eq)).
+Equilibrium now becomes something that influences the overall kinetics.
+You can think of this as a decomposition into three parts: V(S,P) = V x kappa x gamma.
+V is kinetic.
+kappa is saturation.
+gamma is thermodynamic.
+
+Let's explore the thermodynamic rate law a little more.
+What is the equilibrium constant a function of?
+You need to the know the change in the gibbs free energy at standard state.
+
+Delta \bar{G}' = Delta \bar{G}'^0 + RTln(P / S) = -RTlnK_eq'
+
+Delta\bar{G}' = RTln((P / S) / K_eq)
+((P / S) / K_eq) = e^(Delta\bar{G}' / RT)
+
+gamma = 1 - e^(Delta\bar{G}' / RT)
+
+Check 1: what happens if our gibbs = 0?
+gamma = 0 so V(S,P) = 0.
+If your substrates and products are at equilibrium your cells are dead b/c there is not net forward reaction.
+
+Check 2: gibbs < 0?
+e^G/RT < 1, gamma > 0, V > 0.
+We have a net forward reaction.
+
+Check 3: gibbs > 0?
+e^G/RT > 1, gamma < 0, V < 0.
+We have a net reverse reaction.
+What might cause this?
+Have a lot of product and not much substrate.
+
+Biochemistry is a perpetual attempt to escape thermodynamic equilibrium.
+
+Alexis aside:
+What Keq is matters a lot, sometimes it is very small and you only need a very small buildup of product in order to start inhibiting the forward reaction.
+Sometimes Keq is very large and you need to build up a lot of product to inhibit the reaction.
+
+Too often you will read biochemistry papers where only the standard state delta g is calculated and if it is possible then the reaction is said to be impossible.
+
+We have a reversible rate law that we can apply to any of the steps we care about.
+We could now take this and produce the diffusive rate law that we previously found.
+Now we want to take this general reversible rate law and turn it into a rate law for active uptake across a membrane.
+
+It turns out that we need to modify a term to do that.
+What is the equilibrium constant for transport?
+Keq = P / S = 1.
+This is an assumption!
+Based on the idea that concentrations inside and outside are the same when no net transport occurs.
+This would not hold if the transport were dependent on another gradient/substrate.
+
+Where else do we need to make modifications?
+Km measures how rapidly you get to Vmax (big Km, long time).
+It measures saturation.
+We can saturate b/c we have a limited number of pores.
+What is the maximum number of pores?
+Area of membrane/area of each pore.
+What is the area of the membrane?
+
+radius is 1um.
+Area goes as radius^2.
+10^-10 dm^2
+
+What is the area of a pore?
+Can't be smaller than an angstrom.
+An angstrom is 0.1 nm (10^-10 m).
+The area would be 10^-20 m^2.
+
+So 10^8 transport complexes per cell.
+
+If we say the radius of a transport is 100nm, then you can fit 100 transporters per cell.
+That's not a lot.
+You can totally saturate that!
+
+Saturation term changes:
+Km is finite.
+And Km_f is equal to Km_r.
+
+One more term to deal with: Vmax.
+This will require the most manipulation in our case.
+In the sense of a free floating enzyme Vmax is the maximum number of transformations that can happen per unit time.
+It can be divided into kcat and E_tot.
+kcat is the intrinsic rate of catalysis per enzyme.
+Etot is the concentration of enzyme.
+Now what do these mean for a transporter?
+Etot represents the transporter complex.
+But we don't have a concentration, we have a surface density.
+So Etot becomes the number of transporter complexes.
+And kcat becomes moles substrate / moles transporter complex / time.
+This is gonna be a free parameter.
+How are the units looking?
+Right now Vmax is in stuff per time.
+Probably better if we define Etot as the total number of transporters per cell.
+How can we check?
+First order we could assume that this is equivalent to passive diffusion, so see if kcat x Etot is equal to area x permeability.
+
+In what situation might this rate law approach the diffusive one?
+The fundamental control on the diffusive rate law is the gradient.
+What happens if you multiply through by S in our active rate law?
+We kinda already have the gradient built in.
+It's a stretch but we could put in numberical values that would lead to the equivalent of the diffusive rate law.
+The saturation term would have to equal one to ignore it.
+That would happen when Km equals one.
+Can Km equal one?
+No, b/c the maximal concentration in a cell is 100 mM.
+So we need our Kms to be very big to get this term to collapse to one.
+By monkeying around with Kms and Keq you should be able to get this to collapse to the passive rate law.
+
+To add reversibility to a rate law we need Keq and Km_r.
+Should be able to find both of these on BRENDA.
+If need be guess that Km_r = Km_f and leave as a free parameter.
+And we can rely on thermodynamics to give us Keq.
+For this, check out [eQuilibrator](http://equilibrator.weizmann.ac.il/).
+Check if things should even be reversible using [eQuilibrator](http://equilibrator.weizmann.ac.il/) before you start coding everything as reversible.
